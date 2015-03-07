@@ -9,12 +9,12 @@ import urllib
 from datetime import date
 from bs4 import BeautifulSoup
 from json import JSONEncoder as jsonEncode
-base_url = "http://www.akg-bensheim.de/akgweb2011/content/Vertretung/w/"
 
 year = date.today().year
 month = date.today().month
 day = date.today().day
 week = str(date(year, month, day).isocalendar()[1])
+base_url = "http://www.akg-bensheim.de/akgweb2011/content/Vertretung/w/"
 
 url = base_url + week + "/w00000.htm"
 
