@@ -72,4 +72,4 @@ for i in range(1,max_rows):
  
 encodeandlog(vertretung_root, "vertretung.json")
  
-#DEBUG: print vertretung_root#!/usr/bin/env python
+#DEBUG: print vertretung_root
