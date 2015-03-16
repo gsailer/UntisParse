@@ -2,8 +2,9 @@
 #
 # Untis Info Vertretungsplan Parser
 # History:
-# Version 0.9.1 Bug fixes @neo_hac0x
-# Version 0.9 initial code @neo_hac0x
+# 0.9.2 Fixed Strike Tag @neo_hac0x 
+# 0.9.1 Bug fixes @neo_hac0x
+# 0.9 initial code @neo_hac0x
 # Create 05.03.2015 @neo_hac0x
  
 import urllib
@@ -18,7 +19,7 @@ week = str(date(year, month, day).isocalendar()[1])
 base_url = "http://www.akg-bensheim.de/akgweb2011/content/Vertretung/w/"
  
 url = base_url + week + "/w00000.htm"
- 
+
 def getVertretungsplan():
     try:
         vertretungsplan_request = urllib.urlopen(url)
@@ -58,11 +59,15 @@ for i in range(1,max_rows):
             elif i == 5:
                 vertretung["verFach"] = e.string
             elif i == 6:
-                vertretung["fach"] = e.string
+                # strike tag inside table cell
+                strike = e.select("strike")
+                for s in strike:
+                    vertretung["fach"] = s.string
+                    print s.string
+
             elif i == 7:
                 vertretung["verRaum"] = e.string
             elif i == 8:
-                #TODO: fix the "---" problem (strike tag)
                 vertretung["raum"] = e.string
             elif i == 9:
                 vertretung["comment"] = e.string
