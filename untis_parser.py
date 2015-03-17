@@ -1,13 +1,8 @@
 #!/usr/bin/env python
 #
 # Untis Info Vertretungsplan Parser
-# History:
-# 0.9.3 Strike function @neo_hac0x
-# 0.9.2 Fixed Strike Tag @neo_hac0x 
-# 0.9.1 Bug fixes @neo_hac0x
-# 0.9 initial code @neo_hac0x
-# Create 05.03.2015 @neo_hac0x
- 
+# written by @neo_hac0x March 2015
+
 import urllib
 from datetime import date
 from bs4 import BeautifulSoup
