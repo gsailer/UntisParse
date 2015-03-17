@@ -2,6 +2,7 @@
 #
 # Untis Info Vertretungsplan Parser
 # History:
+# 0.9.3 Strike function @neo_hac0x
 # 0.9.2 Fixed Strike Tag @neo_hac0x 
 # 0.9.1 Bug fixes @neo_hac0x
 # 0.9 initial code @neo_hac0x
@@ -27,6 +28,12 @@ def getVertretungsplan():
  
     except Exception as e:
         return e
+
+def strike(lst, field):
+    strk = lst.select("strike")
+    for s in strk:
+        vertretung[field] = s.string
+        print "STRIKE!"
  
 def encodeandlog(data, filename):
     jsonData = jsonEncode().encode(data)
@@ -49,28 +56,51 @@ for i in range(1,max_rows):
             #DEBUG: print str(i) + " " + e.string
  
             if i == 1:
-                vertretung["klasse"] = e.string
+                if "---" in e.string:
+                    strike(e, "klasse")
+                else:
+                    vertretung["klasse"] = e.string
             elif i == 2:
-                vertretung["datum"] = e.string
+                if "---" in e.string:
+                    strike(e, "datum")
+                else:
+                    vertretung["datum"] = e.string
             elif i == 3:
-                vertretung["stunden"] = e.string
+                if "---" in e.string:
+                    strike(e, "stunden")
+                else:
+                    vertretung["stunden"] = e.string
             elif i == 4:
-                vertretung["art"] = e.string
+                if "---" in e.string:
+                    strike(e, "art")
+                else:
+                    vertretung["art"] = e.string
             elif i == 5:
-                vertretung["verFach"] = e.string
+                if "---" in e.string:
+                    strike(e, "verFach")
+                else:
+                    vertretung["verFach"] = e.string
             elif i == 6:
-                # strike tag inside table cell
-                strike = e.select("strike")
-                for s in strike:
-                    vertretung["fach"] = s.string
-                    print s.string
-
+                if "---" in e.string:
+                    strike(e, "fach")
+                else:
+                    vertretung["fach"] = e.string
             elif i == 7:
-                vertretung["verRaum"] = e.string
+                if "---" in e.string:
+                    strike(e, "verRaum")
+                else:
+                    vertretung["verRaum"] = e.string
             elif i == 8:
-                vertretung["raum"] = e.string
+                if "---" in e.string:
+                    strike(e, "raum")
+                else:
+                    vertretung["raum"] = e.string
             elif i == 9:
-                vertretung["comment"] = e.string
+                if "---" in e.string:
+                    strike(e, "comment")
+                else:
+                    vertretung["comment"] = e.string
+                # Write the gathered data for one class to the dict
                 vertretung_root[vertretung["klasse"].encode('UTF-8')] = vertretung
             else:
                 print "[!] Something went wrong."
