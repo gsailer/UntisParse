@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 #
 # Untis Info Vertretungsplan Parser
-# written by @neo_hac0x March 2015
+# v 2.0
+# written by @sublinus October 2015
 
 import urllib
 from datetime import date
 from bs4 import BeautifulSoup
 from json import JSONEncoder as jsonEncode
- 
+
 year = date.today().year
 month = date.today().month
 day = date.today().day
@@ -15,6 +16,18 @@ week = str(date(year, month, day).isocalendar()[1])
 base_url = "http://www.akg-bensheim.de/akgweb2011/content/Vertretung/w/"
  
 url = base_url + week + "/w00000.htm"
+
+class Vertretung:
+    def __init__(self, klasse, datum, std, art, fach, rpl_fach, room, rpl_room, comment):
+        self.klasse = klasse
+        self.datum = datum
+        self.std = std
+        self.art = art
+        self.fach = fach
+        self.rpl_fach = rpl_fach
+        self.room = room
+        self.rpl_room = rpl_room
+        self.comment = comment
 
 def getVertretungsplan():
     try:
@@ -24,82 +37,32 @@ def getVertretungsplan():
     except Exception as e:
         return e
 
-def strike(lst, field):
-    strk = lst.select("strike")
-    for s in strk:
-        vertretung[field] = s.string
-        print "STRIKE!"
- 
-def encodeandlog(data, filename):
-    jsonData = jsonEncode().encode(data)
-    with open(filename, "w") as f:
-        f.write(jsonData)
- 
-doc = BeautifulSoup(getVertretungsplan())
- 
-vertretung_root = {}
+doc = BeautifulSoup(getVertretungsplan()) 
 max_rows = len(doc.find_all("tr"))
- 
+
+vertretungsplan = []
+
 for i in range(1,max_rows):
     tr = doc.select("tr:nth-of-type(" + str(i) +")")
-    vertretung = {}
     for element in tr:
         td = element.select("td.list")
-        i = 0
+        if len(td) <= 0:
+            continue
+        args = []
         for e in td:
-            i = i+1
-            #DEBUG: print str(i) + " " + e.string
- 
-            if i == 1:
-                if "---" in e.string:
-                    strike(e, "klasse")
-                else:
-                    vertretung["klasse"] = e.string
-            elif i == 2:
-                if "---" in e.string:
-                    strike(e, "datum")
-                else:
-                    vertretung["datum"] = e.string
-            elif i == 3:
-                if "---" in e.string:
-                    strike(e, "stunden")
-                else:
-                    vertretung["stunden"] = e.string
-            elif i == 4:
-                if "---" in e.string:
-                    strike(e, "art")
-                else:
-                    vertretung["art"] = e.string
-            elif i == 5:
-                if "---" in e.string:
-                    strike(e, "verFach")
-                else:
-                    vertretung["verFach"] = e.string
-            elif i == 6:
-                if "---" in e.string:
-                    strike(e, "fach")
-                else:
-                    vertretung["fach"] = e.string
-            elif i == 7:
-                if "---" in e.string:
-                    strike(e, "verRaum")
-                else:
-                    vertretung["verRaum"] = e.string
-            elif i == 8:
-                if "---" in e.string:
-                    strike(e, "raum")
-                else:
-                    vertretung["raum"] = e.string
-            elif i == 9:
-                if "---" in e.string:
-                    strike(e, "comment")
-                else:
-                    vertretung["comment"] = e.string
-                # Write the gathered data for one class to the dict
-                vertretung_root[vertretung["klasse"].encode('UTF-8')] = vertretung
-            else:
-                print "[!] Something went wrong."
- 
-encodeandlog(vertretung_root, "vertretung.json")
- 
-#DEBUG: print vertretung_root
+            if e.string is "":
+                args.append(" ")
+            else:        
+                args.append(e.string)
+        
+        v = Vertretung(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7],args[8])
+        vertretungsplan.append(v)
+# test case 
+klassen = []        
+for x in vertretungsplan:
+    if x.klasse in klassen:
+        continue
+    klassen.append(x.klasse)
+
+for x in klassen:
+    print x
