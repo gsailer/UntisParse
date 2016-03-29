@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 #
 # Untis Info Vertretungsplan Parser
-# v 2.0
+# v 2.1
 # written by @sublinus October 2015
 
 import urllib
 from datetime import date
 from bs4 import BeautifulSoup
 from json import JSONEncoder as jsonEncode
+# for debug decorator
+from functools import wraps
 
 year = date.today().year
 month = date.today().month
@@ -16,8 +18,18 @@ week = str(date(year, month, day).isocalendar()[1])
 base_url = "http://www.akg-bensheim.de/akgweb2011/content/Vertretung/w/"
  
 url = base_url + week + "/w00000.htm"
+#### debug decorator ####
+def d(fn):
+    @wraps(fn)
+    def wrapper(*v, **k):
+        print "DEBUG"
+        print "Function: %s" %fn.__name__
+        print "Arguments Given: %s %s" %(v, k)
+        return fn(*v, **k)
+    return wrapper
+########
 
-class Vertretung:
+class Vertretung(object):
     def __init__(self, klasse, datum, std, art, fach, rpl_fach, room, rpl_room, comment):
         self.klasse = klasse
         self.datum = datum
@@ -38,6 +50,20 @@ def getVertretungsplan():
         return e
 
 doc = BeautifulSoup(getVertretungsplan()) 
+def strike(lst, field):
+    strk = lst.select("strike")
+    for s in strk:
+        vertretung[field] = s.string
+        print "STRIKE!"
+        
+def encodeandlog(data, filename):
+    jsonData = jsonEncode().encode(data)
+    with open(filename, "w") as f:
+        f.write(jsonData)
+ 
+doc = BeautifulSoup(getVertretungsplan())
+ 
+vertretung_root = {}
 max_rows = len(doc.find_all("tr"))
 
 vertretungsplan = []
