@@ -1,8 +1,6 @@
-#!/usr/bin/env python
-#
 # Untis Info Vertretungsplan Parser
-# v 2.1
-# written by @sublinus October 2015
+# v 2.2
+# written by @sublinus March 2017
 
 import urllib
 from datetime import date
@@ -40,6 +38,9 @@ class Vertretung(object):
         self.room = room
         self.rpl_room = rpl_room
         self.comment = comment
+    
+    def display(self):
+	return "Klasse: {}\nDatum: {}\nStunde: {}\nArt: {}\nFach: {}\nRaum:{}\nKommentar: {}\n".format(self.klasse, self.datum, self.std, self.art, self.rpl_fach, self.rpl_room, self.comment)
 
 def getVertretungsplan():
     try:
@@ -48,8 +49,7 @@ def getVertretungsplan():
  
     except Exception as e:
         return e
-
-doc = BeautifulSoup(getVertretungsplan()) 
+ 
 def strike(lst, field):
     strk = lst.select("strike")
     for s in strk:
@@ -60,35 +60,32 @@ def encodeandlog(data, filename):
     jsonData = jsonEncode().encode(data)
     with open(filename, "w") as f:
         f.write(jsonData)
- 
-doc = BeautifulSoup(getVertretungsplan())
- 
-vertretung_root = {}
-max_rows = len(doc.find_all("tr"))
 
-vertretungsplan = []
+def parseVertretungsplan():
+    doc = BeautifulSoup(getVertretungsplan(), "lxml")
+ 
+    vertretung_root = {}
+    max_rows = len(doc.find_all("tr"))
 
-for i in range(1,max_rows):
-    tr = doc.select("tr:nth-of-type(" + str(i) +")")
-    for element in tr:
-        td = element.select("td.list")
-        if len(td) <= 0:
-            continue
-        args = []
-        for e in td:
-            if e.string is "":
-                args.append(" ")
-            else:        
-                args.append(e.string)
-        
-        v = Vertretung(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7],args[8])
-        vertretungsplan.append(v)
+    vertretungsplan = []
+
+    for i in range(1,max_rows):
+        tr = doc.select("tr:nth-of-type(" + str(i) +")")
+        for element in tr:
+            td = element.select("td.list")
+            if len(td) <= 0:
+                continue
+            args = []
+            for e in td:
+                args.append(e.string.encode('utf-8'))
+            
+            v = Vertretung(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7],args[8])
+            vertretungsplan.append(v)
+    return vertretungsplan
+
 # test case 
-klassen = []        
-for x in vertretungsplan:
-    if x.klasse in klassen:
-        continue
-    klassen.append(x.klasse)
-
-for x in klassen:
-    print x
+if __name__ == "__main__":
+    vertretungsplan_by_klasse = sorted(vertretungsplan, key=lambda vertretung: vertretung.std)
+    for x in vertretungsplan_by_klasse:
+        if x.klasse == "K12":
+    	   print x.display()
