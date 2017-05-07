@@ -10,6 +10,9 @@ parser.add_argument('-d', '--destination', default="./html")
 args = parser.parse_args()
 
 plan = untis_parser.parseVertretungsplan(date.today().isocalendar()[1])
+for x in untis_parser.parseVertretungsplan(date.today().isocalendar()[1] + 1):
+	plan.append(x)
+	
 klassen = set([])
 for x in plan:
 	klassen.add(x)
