@@ -1,6 +1,6 @@
 # flask_api server for vertretung
 from flask import Flask, jsonify, abort
-import json
+import json, codecs
 import argparse
 import untis_parser
 
@@ -16,7 +16,7 @@ for x in plan:
 
 if args.cron:
 	with open("{}/vertretung.json".format(args.destination), "w") as f:
-		json.dump([ob.__dict__ for ob in plan], f, ensure_ascii=False)
+		json.dump([ob.__dict__ for ob in plan], codecs.getwriter('utf-8')(f), ensure_ascii=False)
 else:
 	app = Flask(__name__)
 

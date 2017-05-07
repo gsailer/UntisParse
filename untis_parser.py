@@ -8,9 +8,7 @@ from bs4 import BeautifulSoup
 from json import JSONEncoder as jsonEncode
 
 base_url = "http://www.akg-bensheim.de/akgweb2011/content/Vertretung/w/"
-week = str(date.today().isocalendar()[1])
-
-url = base_url + week + "/w00000.htm"
+current_week = date.today().isocalendar()[1]
 
 class Vertretung(object):
     def __init__(self, klasse, datum, std, art, fach, rpl_fach, room, rpl_room, comment):
@@ -27,15 +25,15 @@ class Vertretung(object):
     def display(self):
 	return "Klasse: {}\nDatum: {}\nStunde: {}\nArt: {}\nFach: {}\nRaum: {}\nKommentar: {}\n".format(self.klasse, self.datum, self.std, self.art, self.rpl_fach, self.rpl_room, self.comment)
 
-def getVertretungsplan():
+def getVertretungsplan(week):
     try:
-        vertretungsplan_request = urllib.urlopen(url)
+        vertretungsplan_request = urllib.urlopen(url = base_url + str(week) + "/w00000.htm")
         return vertretungsplan_request.read() 
     except Exception as e:
         return e
 
-def parseVertretungsplan():
-    doc = BeautifulSoup(getVertretungsplan(), "lxml")
+def parseVertretungsplan(week):
+    doc = BeautifulSoup(getVertretungsplan(week), "lxml")
     vertretung_root = {}
     max_rows = len(doc.find_all("tr"))
     vertretungsplan = []
@@ -54,8 +52,10 @@ def parseVertretungsplan():
 
 # test case 
 if __name__ == "__main__":
-    vertretungsplan = parseVertretungsplan()
+    vertretungsplan = parseVertretungsplan(current_week)
+    for x in parseVertretungsplan(current_week+1):
+        vertretungsplan.append(x)
     vertretungsplan_by_klasse = sorted(vertretungsplan, key=lambda vertretung: vertretung.std)
     for x in vertretungsplan_by_klasse:
-        if x.klasse == "K12":
+        if "8a" in x.klasse:
     	   print x.display()
