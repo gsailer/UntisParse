@@ -9,7 +9,7 @@ parser.add_argument('--cron', action='store_true')
 parser.add_argument('-d', '--destination', default="./html")
 args = parser.parse_args()
 
-plan = untis_parser.parseVertretungsplan()
+plan = untis_parser.parseVertretungsplan(date.today().isocalendar()[1])
 klassen = set([])
 for x in plan:
 	klassen.add(x)
